@@ -15,56 +15,23 @@ resource "aws_internet_gateway" "gw" {
   }
 }
 
-resource "aws_subnet" "public1" {
-  vpc_id     = aws_vpc.example.id
-  cidr_block = cidrsubnet(var.base_cidr_block,4,1)
-
+resource "aws_subnet" "public" {
+  count       = length(var.availability_zones)
+  vpc_id      = aws_vpc.example.id
+  availability_zone = var.availability_zones[count.index]
+  cidr_block   = cidrsubnet(var.base_cidr_block,4,count.index+1)
   tags = {
-    Name = "george-public-1-tf"
+    Name = "george-public-${count.index}-tf"
   }
 }
 
-resource "aws_subnet" "public2" {
+resource "aws_subnet" "private" {
+  count = length(var.availability_zones)
   vpc_id     = aws_vpc.example.id
-  cidr_block = cidrsubnet(var.base_cidr_block,4,2)
-
+  availability_zone = var.availability_zones[count.index]
+  cidr_block = cidrsubnet(var.base_cidr_block,4,count.index+length(var.availability_zones)+1)
   tags = {
-    Name = "george-public-2-tf"
-  }
-}
-resource "aws_subnet" "public3" {
-  vpc_id     = aws_vpc.example.id
-  cidr_block = cidrsubnet(var.base_cidr_block,4,3)
-
-  tags = {
-    Name = "george-public-3-tf"
-  }
-}
-
-
-resource "aws_subnet" "private1" {
-  vpc_id     = aws_vpc.example.id
-  cidr_block = cidrsubnet(var.base_cidr_block,4,4)
-
-  tags = {
-    Name = "george-private-1-tf"
-  }
-}
-
-resource "aws_subnet" "private2" {
-  vpc_id     = aws_vpc.example.id
-  cidr_block = cidrsubnet(var.base_cidr_block,4,5)
-
-  tags = {
-    Name = "george-private-2-tf"
-  }
-}
-resource "aws_subnet" "private3" {
-  vpc_id     = aws_vpc.example.id
-  cidr_block = cidrsubnet(var.base_cidr_block,4,6)
-
-  tags = {
-    Name = "george-private-3-tf"
+    Name = "george-private-${count.index}-tf"
   }
 }
 
@@ -90,29 +57,14 @@ resource "aws_route_table" "route_table_private" {
   }
 }
 
-
-resource "aws_route_table_association" "a" {
-  subnet_id      = aws_subnet.public1.id
-  route_table_id = aws_route_table.route_table_public.id
-}
-resource "aws_route_table_association" "b" {
-  subnet_id      = aws_subnet.public2.id
-  route_table_id = aws_route_table.route_table_public.id
-}
-resource "aws_route_table_association" "c" {
-  subnet_id      = aws_subnet.public3.id
+resource "aws_route_table_association" "public" {
+  count = length(var.availability_zones)
+  subnet_id      = element(aws_subnet.public.*.id, count.index)
   route_table_id = aws_route_table.route_table_public.id
 }
 
-resource "aws_route_table_association" "d" {
-  subnet_id      = aws_subnet.private1.id
-  route_table_id = aws_route_table.route_table_private.id
-}
-resource "aws_route_table_association" "e" {
-  subnet_id      = aws_subnet.private2.id
-  route_table_id = aws_route_table.route_table_private.id
-}
-resource "aws_route_table_association" "f" {
-  subnet_id      = aws_subnet.private3.id
+resource "aws_route_table_association" "private" {
+  count = length(var.availability_zones)
+  subnet_id      = element(aws_subnet.private.*.id, count.index)
   route_table_id = aws_route_table.route_table_private.id
 }

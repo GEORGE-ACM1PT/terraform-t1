@@ -2,13 +2,22 @@ terraform {
   required_providers {
     aws = {
       source  = "hashicorp/aws"
-      version = "~> 3.0"
+      version = "~> 3.38.0"
     }
   }
 }
 
+locals {
+  DateTime = formatdate("DD MMM YYYY - HH:mm AA ZZZ", timestamp())
+}
 provider "aws" {
   region = var.aws_region
+  default_tags {
+    tags = {
+      CreationDateTime = local.DateTime
+      Owner       = "george-nclouds"
+    }
+  }
 }
 
 
