@@ -15,7 +15,7 @@ data "aws_ami" "ubuntu" {
 }
 
 
-resource "aws_launch_configuration" "as_conf" {
+resource "aws_launch_configuration" "lc_conf" {
   name          = var.lc_name
   image_id      = data.aws_ami.ubuntu.id
   instance_type = "t2.micro"
