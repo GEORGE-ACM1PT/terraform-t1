@@ -8,13 +8,13 @@ terraform {
 }
 
 locals {
-  DateTime = formatdate("DD MMM YYYY - HH:mm AA ZZZ", timestamp())
+  DateTime = formatdate("DD MMM YYYY ", timestamp())
 }
 provider "aws" {
   region = var.aws_region
   default_tags {
     tags = {
-      CreationDateTime = local.DateTime
+      CreationDate = local.DateTime
       Owner       = "george-nclouds"
     }
   }
