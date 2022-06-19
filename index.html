@@ -24,7 +24,7 @@
         .attr("transform", `translate(${margin.left},${margin.top})`);
     
     //Read the data
-    d3.csv("https://raw.githubusercontent.com/GEORGE-ACM1PT/terraform-t1/main/g1.csv",
+    d3.csv("./g1.csv",
       // When reading the csv, I must format variables:
       function(d){
         return { date : d.date, value : d._2018 }
